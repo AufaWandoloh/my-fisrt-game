@@ -92,6 +92,7 @@ class TheEnchantersFateGame(Widget):
         ]  # ตำแหน่งของหิน
         self.position = [2, 0]  # ตำแหน่งผู้เล่นเริ่มต้น
         self.exit_position = (2, 10)  # ตำแหน่งประตู
+        self.enemy_position = [10, 10]  # ศัตรูเริ่มที่มุมขวาบน
 
         # ตั้งค่าขนาดหน้าต่าง
         Window.clearcolor = (0.1, 0.1, 0.1, 1)
@@ -158,6 +159,18 @@ class TheEnchantersFateGame(Widget):
                 size=(self.cell_size, self.cell_size),
             )
 
+    def draw_enemy(self):
+        """วาดตำแหน่งศัตรู"""
+        with self.canvas:
+            Color(0, 1, 0)  # สีเขียวสำหรับศัตรู
+            Rectangle(
+                pos=(
+                    self.enemy_position[0] * self.cell_size + self.offset_x,
+                    self.enemy_position[1] * self.cell_size + self.offset_y,
+                ),
+                size=(self.cell_size, self.cell_size),
+            )
+
     def draw_exit(self):
         """วาดตำแหน่งประตู"""
         with self.canvas:
@@ -196,6 +209,30 @@ class TheEnchantersFateGame(Widget):
             )
             self.add_widget(win_label)
 
+    def move_enemy(self):
+        """เคลื่อนที่ศัตรูเข้าหาผู้เล่น"""
+        for _ in range(2):  # ศัตรูเดินได้ 2 ก้าว
+            dx = self.position[0] - self.enemy_position[0]
+            dy = self.position[1] - self.enemy_position[1]
+            step_x = 1 if dx > 0 else -1 if dx < 0 else 0
+            step_y = 1 if dy > 0 else -1 if dy < 0 else 0
+
+        # เลือกการเคลื่อนที่ในแนวที่สั้นที่สุด
+        if abs(dx) > abs(dy):
+            new_x = self.enemy_position[0] + step_x
+            new_y = self.enemy_position[1]
+        else:
+            new_x = self.enemy_position[0]
+            new_y = self.enemy_position[1] + step_y
+
+        # ตรวจสอบว่าตำแหน่งใหม่ไม่ชนกับหิน
+        if (
+            0 <= new_x < self.grid_size
+            and 0 <= new_y < self.grid_size
+            and (new_x, new_y) not in self.obstacles
+        ):
+            self.enemy_position = [new_x, new_y]
+
     def move(self, dx, dy):
         """ฟังก์ชันเคลื่อนที่ตัวละคร"""
         if self.game_over:
@@ -216,6 +253,23 @@ class TheEnchantersFateGame(Widget):
         self.draw_obstacles()
         self.draw_character()
         self.draw_exit()
+        self.draw_enemy()
+        self.move_enemy()
+        self.check_win()
+
+        if self.position == self.enemy_position:
+            self.game_over = True
+            lose_label = Label(
+                text="YOU LOSE!",
+                font_size=50,
+                bold=True,
+                color=(1, 0, 0, 1),
+                size_hint=(None, None),
+                pos=(Window.width // 2 - 100, Window.height // 2 - 25),
+            )
+            self.add_widget(lose_label)
+
+        # ตรวจสอบว่าชนะหรือไม่
         self.check_win()
 
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
