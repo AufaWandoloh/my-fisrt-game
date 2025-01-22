@@ -106,6 +106,7 @@ class TheEnchantersFateGame(Widget):
         self.draw_obstacles()
         self.draw_character()
         self.draw_exit()
+        self.draw_enemy()
 
         # เพิ่มข้อความคำแนะนำ
         self.add_instructions()
@@ -209,16 +210,17 @@ class TheEnchantersFateGame(Widget):
             )
             self.add_widget(win_label)
 
+    # ฟังก์ชันเคลื่อนที่ศัตรู (แก้ไข)
     def move_enemy(self):
-        """เคลื่อนที่ศัตรูเข้าหาผู้เล่น"""
+        """เคลื่อนที่ศัตรูเข้าหาผู้เล่นอย่างฉลาด"""
         for _ in range(2):  # ศัตรูเดินได้ 2 ก้าว
             dx = self.position[0] - self.enemy_position[0]
             dy = self.position[1] - self.enemy_position[1]
             step_x = 1 if dx > 0 else -1 if dx < 0 else 0
             step_y = 1 if dy > 0 else -1 if dy < 0 else 0
 
-        # เลือกการเคลื่อนที่ในแนวที่สั้นที่สุด
-        if abs(dx) > abs(dy):
+        # ลองเคลื่อนที่ในแนวที่สั้นที่สุดก่อน
+        if abs(dx) >= abs(dy):
             new_x = self.enemy_position[0] + step_x
             new_y = self.enemy_position[1]
         else:
@@ -232,6 +234,21 @@ class TheEnchantersFateGame(Widget):
             and (new_x, new_y) not in self.obstacles
         ):
             self.enemy_position = [new_x, new_y]
+        else:
+            # ถ้าการเคลื่อนที่หลักไม่สำเร็จ ลองอีกทิศทางหนึ่ง
+            if abs(dx) >= abs(dy):
+                new_x = self.enemy_position[0]
+                new_y = self.enemy_position[1] + step_y
+            else:
+                new_x = self.enemy_position[0] + step_x
+                new_y = self.enemy_position[1]
+
+            if (
+                0 <= new_x < self.grid_size
+                and 0 <= new_y < self.grid_size
+                and (new_x, new_y) not in self.obstacles
+            ):
+                self.enemy_position = [new_x, new_y]
 
     def move(self, dx, dy):
         """ฟังก์ชันเคลื่อนที่ตัวละคร"""
