@@ -92,7 +92,7 @@ class TheEnchantersFateGame(Widget):
         ]  # ตำแหน่งของหิน
         self.position = [2, 0]  # ตำแหน่งผู้เล่นเริ่มต้น
         self.exit_position = (2, 10)  # ตำแหน่งประตู
-        self.enemy_position = [10, 10]  # ศัตรูเริ่มที่มุมขวาบน
+        self.enemy_position = [8, 10]  # ศัตรูเริ่มที่มุมขวาบน
 
         # ตั้งค่าขนาดหน้าต่าง
         Window.clearcolor = (0.1, 0.1, 0.1, 1)
@@ -210,45 +210,46 @@ class TheEnchantersFateGame(Widget):
             )
             self.add_widget(win_label)
 
-    # ฟังก์ชันเคลื่อนที่ศัตรู (แก้ไข)
     def move_enemy(self):
-        """เคลื่อนที่ศัตรูเข้าหาผู้เล่นอย่างฉลาด"""
-        for _ in range(2):  # ศัตรูเดินได้ 2 ก้าว
+        """เคลื่อนที่ศัตรูเข้าแนวตั้งหรือแนวนอนก่อน แล้วค่อยเข้าหาผู้เล่น โดยไม่เดินผ่านสิ่งกีดขวาง"""
+        steps = 2  # ศัตรูเดินได้ 2 ก้าว
+        for _ in range(steps):
             dx = self.position[0] - self.enemy_position[0]
             dy = self.position[1] - self.enemy_position[1]
-            step_x = 1 if dx > 0 else -1 if dx < 0 else 0
-            step_y = 1 if dy > 0 else -1 if dy < 0 else 0
 
-        # ลองเคลื่อนที่ในแนวที่สั้นที่สุดก่อน
-        if abs(dx) >= abs(dy):
-            new_x = self.enemy_position[0] + step_x
-            new_y = self.enemy_position[1]
-        else:
-            new_x = self.enemy_position[0]
-            new_y = self.enemy_position[1] + step_y
-
-        # ตรวจสอบว่าตำแหน่งใหม่ไม่ชนกับหิน
-        if (
-            0 <= new_x < self.grid_size
-            and 0 <= new_y < self.grid_size
-            and (new_x, new_y) not in self.obstacles
-        ):
-            self.enemy_position = [new_x, new_y]
-        else:
-            # ถ้าการเคลื่อนที่หลักไม่สำเร็จ ลองอีกทิศทางหนึ่ง
-            if abs(dx) >= abs(dy):
-                new_x = self.enemy_position[0]
-                new_y = self.enemy_position[1] + step_y
-            else:
+            # พยายามเดินเข้าแนวตั้งก่อน (แกน x)
+            if dx != 0:
+                step_x = 1 if dx > 0 else -1
                 new_x = self.enemy_position[0] + step_x
                 new_y = self.enemy_position[1]
 
-            if (
-                0 <= new_x < self.grid_size
-                and 0 <= new_y < self.grid_size
-                and (new_x, new_y) not in self.obstacles
-            ):
-                self.enemy_position = [new_x, new_y]
+                # ตรวจสอบว่าตำแหน่งใหม่ไม่มีสิ่งกีดขวาง
+                if (new_x, new_y) not in self.obstacles:
+                    self.enemy_position = [new_x, new_y]
+                    continue  # เดินเสร็จแล้วให้ไปก้าวถัดไป
+
+            # หากไม่สามารถเดินแนวตั้งได้หรือ dx == 0 ให้ลองเดินแนวนอน (แกน y)
+            if dy != 0:
+                step_y = 1 if dy > 0 else -1
+                new_x = self.enemy_position[0]
+                new_y = self.enemy_position[1] + step_y
+
+                # ตรวจสอบว่าตำแหน่งใหม่ไม่มีสิ่งกีดขวาง
+                if (new_x, new_y) not in self.obstacles:
+                    self.enemy_position = [new_x, new_y]
+
+        # ตรวจสอบว่าผู้เล่นอยู่ในช่องเดียวกับศัตรู
+        if self.position == self.enemy_position:
+            self.game_over = True
+            lose_label = Label(
+                text="YOU LOSE!",
+                font_size=50,
+                bold=True,
+                color=(1, 0, 0, 1),
+                size_hint=(None, None),
+                pos=(Window.width // 2 - 100, Window.height // 2 - 25),
+            )
+            self.add_widget(lose_label)
 
     def move(self, dx, dy):
         """ฟังก์ชันเคลื่อนที่ตัวละคร"""
