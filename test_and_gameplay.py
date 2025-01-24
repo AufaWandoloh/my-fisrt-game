@@ -39,11 +39,31 @@ class MenuScreen(Screen):
         self.manager.current = "game"
 
 
-# หน้าจอเกม (TheEnchantersFateGame)
 class GameScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.game = TheEnchantersFateGame()
+        self.add_widget(self.game)
+
+        # เพิ่ม UI ที่มุมขวาบน
+        self.add_ui()
+
+    def add_ui(self):
+        """เพิ่ม UI สำหรับปุ่มเริ่มใหม่"""
+        restart_button = Button(
+            text="restart",
+            font_size=20,
+            size_hint=(None, None),
+            size=(120, 50),
+            pos=(Window.width - 150, 20),
+        )
+        restart_button.bind(on_press=self.restart_game)
+        self.add_widget(restart_button)
+
+    def restart_game(self, instance):
+        """รีเซ็ตเกมใหม่"""
+        self.remove_widget(self.game)  # ลบเกมเก่าออก
+        self.game = TheEnchantersFateGame()  # สร้างเกมใหม่
         self.add_widget(self.game)
 
 
