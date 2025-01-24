@@ -61,63 +61,27 @@ class GameScreen(Screen):
         self.add_widget(restart_button)
 
     def restart_game(self, instance):
-        """รีเซ็ตเกมใหม่"""
-        self.remove_widget(self.game)  # ลบเกมเก่าออก
-        self.game = TheEnchantersFateGame()  # สร้างเกมใหม่
-        self.add_widget(self.game)
+        """รีเซ็ตเกมใหม่ในด่านปัจจุบัน"""
+        self.game.restart_level()
 
 
 # เกม The Enchanter's Fate
 class TheEnchantersFateGame(Widget):
-    def __init__(self, **kwargs):
+    def __init__(self, level=1, **kwargs):
         super().__init__(**kwargs)
-        self.grid_size = 11  # ขนาดของแผนที่ (10x10)
+        self.level = level  # เก็บข้อมูลด่านปัจจุบัน
+        self.grid_size = 11  # ขนาดของแผนที่
         self.cell_size = 50  # ขนาดของแต่ละช่องในตาราง
-        self.obstacles = [
-            (0, 5),
-            (1, 1),
-            (1, 2),
-            (1, 3),
-            (1, 5),
-            (1, 6),
-            (2, 3),
-            (3, 0),
-            (3, 1),
-            (3, 3),
-            (3, 5),
-            (3, 6),
-            (3, 7),
-            (3, 9),
-            (3, 10),
-            (4, 1),
-            (4, 7),
-            (5, 1),
-            (5, 2),
-            (5, 7),
-            (5, 8),
-            (5, 9),
-            (6, 9),
-            (7, 0),
-            (7, 1),
-            (7, 3),
-            (7, 4),
-            (7, 5),
-            (7, 6),
-            (7, 7),
-            (7, 9),
-            (8, 3),
-            (9, 3),
-            (9, 9),
-            (10, 9),
-        ]  # ตำแหน่งของหิน
-        self.position = [2, 0]  # ตำแหน่งผู้เล่นเริ่มต้น
-        self.exit_position = (2, 10)  # ตำแหน่งประตู
-        self.enemy_position = [8, 10]  # ศัตรูเริ่มที่มุมขวาบน
+        self.obstacles = []  # อุปสรรคของแต่ละด่าน
+        self.position = []  # ตำแหน่งเริ่มต้นของผู้เล่น
+        self.exit_position = []  # ตำแหน่งของประตู
+        self.enemy_position = []  # ตำแหน่งศัตรูสำหรับแต่ละด่าน
+
+        # ตั้งค่าอุปสรรคและตำแหน่งสำหรับด่านเริ่มต้น
+        self.setup_level()
 
         # ตั้งค่าขนาดหน้าต่าง
         Window.clearcolor = (0.1, 0.1, 0.1, 1)
-
-        # คำนวณตำแหน่งตารางให้อยู่ตรงกลาง
         self.offset_x = (Window.width - self.grid_size * self.cell_size) // 2
         self.offset_y = (Window.height - self.grid_size * self.cell_size) // 2
 
@@ -137,6 +101,106 @@ class TheEnchantersFateGame(Widget):
 
         self.game_over = False  # ตัวแปรสำหรับตรวจสอบว่าเกมจบแล้วหรือไม่
         self.key_pressed = False
+
+    def setup_level(self):
+        """ตั้งค่าด่านตามค่า self.level"""
+        if self.level == 1:
+            self.position = [2, 0]
+            self.exit_position = (2, 10)
+            self.obstacles = [
+                (0, 5),
+                (1, 1),
+                (1, 2),
+                (1, 3),
+                (1, 5),
+                (1, 6),
+                (2, 3),
+                (3, 0),
+                (3, 1),
+                (3, 3),
+                (3, 5),
+                (3, 7),
+                (3, 10),
+                (4, 1),
+                (4, 5),
+                (4, 7),
+                (5, 1),
+                (5, 2),
+                (5, 5),
+                (5, 6),
+                (5, 7),
+                (5, 8),
+                (5, 9),
+                (6, 9),
+                (7, 0),
+                (7, 1),
+                (7, 3),
+                (7, 4),
+                (7, 5),
+                (7, 6),
+                (7, 7),
+                (7, 9),
+                (8, 3),
+                (9, 3),
+                (9, 9),
+                (10, 9),
+            ]
+            self.enemy_position = [(8, 10)]  # ตำแหน่งศัตรูด่าน 1
+        elif self.level == 2:
+            self.position = [6, 5]
+            self.exit_position = (9, 10)
+            self.obstacles = [
+                (1, 2),
+                (1, 3),
+                (1, 4),
+                (1, 7),
+                (1, 8),
+                (1, 9),
+                (2, 4),
+                (3, 2),
+                (3, 3),
+                (3, 4),
+                (3, 5),
+                (3, 6),
+                (3, 8),
+                (3, 9),
+                (5, 0),
+                (5, 1),
+                (5, 2),
+                (5, 3),
+                (5, 4),
+                (6, 4),
+                (7, 2),
+                (7, 4),
+                (7, 5),
+                (7, 6),
+                (7, 7),
+                (8, 2),
+                (9, 4),
+                (9, 8),
+                (9, 9),
+                (10, 4),
+            ]
+            self.enemy_position = [(10, 10)]  # ตำแหน่งศัตรูด่าน 2
+        else:
+            self.position = [0, 0]
+            self.exit_position = (10, 10)
+            self.obstacles = []  # อุปสรรคสำหรับด่านอื่นๆ
+            self.enemy_position = []  # ไม่มีศัตรูในด่านอื่น
+
+    def restart_level(self):
+        """เริ่มใหม่ในด่านปัจจุบัน"""
+        self.game_over = False  # รีเซ็ตสถานะเกม
+        self.setup_level()  # ตั้งค่าด่านใหม่
+
+        # ล้างและวาดองค์ประกอบใหม่
+        self.canvas.clear()
+        self.draw_grid()
+        self.draw_obstacles()
+        self.draw_character()
+        self.draw_exit()
+        self.draw_enemy()
+        self.add_instructions()
 
     def draw_grid(self):
         """วาดตารางหมากรุก"""
@@ -181,16 +245,17 @@ class TheEnchantersFateGame(Widget):
             )
 
     def draw_enemy(self):
-        """วาดตำแหน่งศัตรู"""
+        """วาดศัตรูทั้งหมดในด่าน"""
         with self.canvas:
-            Color(0, 1, 0)  # สีเขียวสำหรับศัตรู
-            Rectangle(
-                pos=(
-                    self.enemy_position[0] * self.cell_size + self.offset_x,
-                    self.enemy_position[1] * self.cell_size + self.offset_y,
-                ),
-                size=(self.cell_size, self.cell_size),
-            )
+            for enemy in self.enemy_position:
+                Color(0, 1, 0)  # สีเขียวสำหรับศัตรู
+                Rectangle(
+                    pos=(
+                        enemy[0] * self.cell_size + self.offset_x,
+                        enemy[1] * self.cell_size + self.offset_y,
+                    ),
+                    size=(self.cell_size, self.cell_size),
+                )
 
     def draw_exit(self):
         """วาดตำแหน่งประตู"""
@@ -216,50 +281,35 @@ class TheEnchantersFateGame(Widget):
         )
         self.add_widget(self.instructions)
 
-    def check_win(self):
-        """ตรวจสอบว่าผู้เล่นชนะแผนที่หรือไม่"""
-        if self.position == list(self.exit_position):
-            self.game_over = True
-            win_label = Label(
-                text="YOU WIN!",
-                font_size=50,
-                bold=True,
-                color=(0, 1, 0, 1),
-                size_hint=(None, None),
-                pos=(Window.width // 2 - 100, Window.height // 2 - 25),
-            )
-            self.add_widget(win_label)
-
     def move_enemy(self):
-        """เคลื่อนที่ศัตรูเข้าแนวตั้งหรือแนวนอนก่อน แล้วค่อยเข้าหาผู้เล่น โดยไม่เดินผ่านสิ่งกีดขวาง"""
-        steps = 2  # ศัตรูเดินได้ 2 ก้าว
-        for _ in range(steps):
-            dx = self.position[0] - self.enemy_position[0]
-            dy = self.position[1] - self.enemy_position[1]
+        """เคลื่อนที่ศัตรูแต่ละตัว"""
+        steps = 2  # ศัตรูเดินได้ 2 ก้าวต่อรอบ
+        for idx, enemy in enumerate(self.enemy_position):
+            for _ in range(steps):  # ลูปเดิน 2 ครั้งสำหรับแต่ละศัตรู
+                dx = self.position[0] - enemy[0]
+                dy = self.position[1] - enemy[1]
 
-            # พยายามเดินเข้าแนวตั้งก่อน (แกน x)
-            if dx != 0:
-                step_x = 1 if dx > 0 else -1
-                new_x = self.enemy_position[0] + step_x
-                new_y = self.enemy_position[1]
+                # พยายามเดินเข้าแนวตั้งก่อน
+                if dx != 0:
+                    step_x = 1 if dx > 0 else -1
+                    new_x = enemy[0] + step_x
+                    new_y = enemy[1]
+                    if (new_x, new_y) not in self.obstacles:
+                        self.enemy_position[idx] = (new_x, new_y)
+                        enemy = (new_x, new_y)  # อัปเดตตำแหน่งศัตรู
+                        continue
 
-                # ตรวจสอบว่าตำแหน่งใหม่ไม่มีสิ่งกีดขวาง
-                if (new_x, new_y) not in self.obstacles:
-                    self.enemy_position = [new_x, new_y]
-                    continue  # เดินเสร็จแล้วให้ไปก้าวถัดไป
+                # ถ้าไม่ได้ ให้เดินแนวนอน
+                if dy != 0:
+                    step_y = 1 if dy > 0 else -1
+                    new_x = enemy[0]
+                    new_y = enemy[1] + step_y
+                    if (new_x, new_y) not in self.obstacles:
+                        self.enemy_position[idx] = (new_x, new_y)
+                        enemy = (new_x, new_y)  # อัปเดตตำแหน่งศัตรู
 
-            # หากไม่สามารถเดินแนวตั้งได้หรือ dx == 0 ให้ลองเดินแนวนอน (แกน y)
-            if dy != 0:
-                step_y = 1 if dy > 0 else -1
-                new_x = self.enemy_position[0]
-                new_y = self.enemy_position[1] + step_y
-
-                # ตรวจสอบว่าตำแหน่งใหม่ไม่มีสิ่งกีดขวาง
-                if (new_x, new_y) not in self.obstacles:
-                    self.enemy_position = [new_x, new_y]
-
-        # ตรวจสอบว่าผู้เล่นอยู่ในช่องเดียวกับศัตรู
-        if self.position == self.enemy_position:
+        # ตรวจสอบว่าผู้เล่นโดนศัตรูตัวใดตัวหนึ่ง
+        if tuple(self.position) in self.enemy_position:
             self.game_over = True
             lose_label = Label(
                 text="YOU LOSE!",
@@ -285,7 +335,7 @@ class TheEnchantersFateGame(Widget):
         ):
             self.position = [new_x, new_y]
 
-        # วาดตัวละครใหม่
+        # วาดองค์ประกอบใหม่
         self.canvas.clear()
         self.draw_grid()
         self.draw_obstacles()
@@ -293,9 +343,24 @@ class TheEnchantersFateGame(Widget):
         self.draw_exit()
         self.draw_enemy()
         self.move_enemy()
-        self.check_win()
 
-        if self.position == self.enemy_position:
+        # ตรวจสอบว่าผู้เล่นไปถึงประตูแล้วหรือยัง
+        if self.position == list(self.exit_position):
+            self.level += 1  # เพิ่มด่าน
+            if self.level > 2:  # หากเกินด่านที่มีให้
+                self.level = 1  # รีเซ็ตกลับไปด่านแรก (หรือจะทำสิ้นสุดเกมก็ได้)
+            self.setup_level()
+
+            # ล้างและวาดองค์ประกอบใหม่สำหรับด่านใหม่
+            self.canvas.clear()
+            self.draw_grid()
+            self.draw_obstacles()
+            self.draw_character()
+            self.draw_exit()
+            self.draw_enemy()
+
+        # ตรวจสอบสถานะการแพ้
+        if tuple(self.position) in self.enemy_position:
             self.game_over = True
             lose_label = Label(
                 text="YOU LOSE!",
@@ -306,9 +371,6 @@ class TheEnchantersFateGame(Widget):
                 pos=(Window.width // 2 - 100, Window.height // 2 - 25),
             )
             self.add_widget(lose_label)
-
-        # ตรวจสอบว่าชนะหรือไม่
-        self.check_win()
 
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
         """ฟังก์ชันตรวจจับการกดปุ่ม"""
