@@ -7,6 +7,7 @@ from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.image import Image
 
+
 # ตั้งค่าขนาดหน้าต่าง
 Window.size = (800, 600)
 
@@ -147,7 +148,7 @@ class TheEnchantersFateGame(Widget):
             ]
             self.enemy_position = [(8, 10)]  # ตำแหน่งศัตรูด่าน 1
         elif self.level == 2:
-            self.position = [6, 5]
+            self.position = [5, 4]
             self.exit_position = (9, 10)
             self.obstacles = [
                 (1, 2),
@@ -157,25 +158,22 @@ class TheEnchantersFateGame(Widget):
                 (1, 8),
                 (1, 9),
                 (2, 4),
-                (3, 2),
                 (3, 3),
                 (3, 4),
                 (3, 5),
                 (3, 6),
                 (3, 8),
                 (3, 9),
-                (5, 0),
                 (5, 1),
-                (5, 2),
-                (5, 3),
-                (5, 4),
-                (6, 4),
-                (7, 2),
+                (6, 3),
+                (6, 2),
                 (7, 4),
                 (7, 5),
                 (7, 6),
                 (7, 7),
+                (7, 10),
                 (8, 2),
+                (9, 2),
                 (9, 4),
                 (9, 8),
                 (9, 9),
@@ -284,42 +282,42 @@ class TheEnchantersFateGame(Widget):
     def move_enemy(self):
         """เคลื่อนที่ศัตรูแต่ละตัว"""
         steps = 2  # ศัตรูเดินได้ 2 ก้าวต่อรอบ
-        for idx, enemy in enumerate(self.enemy_position):
-            for _ in range(steps):  # ลูปเดิน 2 ครั้งสำหรับแต่ละศัตรู
-                dx = self.position[0] - enemy[0]
-                dy = self.position[1] - enemy[1]
+        prev_position = getattr(
+            self, "prev_position", self.position
+        )  # ตำแหน่งก่อนหน้าของผู้เล่น
 
-                # พยายามเดินเข้าแนวตั้งก่อน
+        for idx, enemy in enumerate(self.enemy_position):
+            for step in range(steps):  # ลูปเดิน 2 ครั้งสำหรับแต่ละศัตรู
+                if step == 0:
+                    # ก้าวแรก: เดินตามทิศทางการเคลื่อนที่ของผู้เล่น (จากตำแหน่งก่อนหน้า)
+                    dx = prev_position[0] - enemy[0]
+                    dy = prev_position[1] - enemy[1]
+                else:
+                    # ก้าวที่สอง: เดินเข้าหาผู้เล่นตามตำแหน่งปัจจุบัน
+                    dx = self.position[0] - enemy[0]
+                    dy = self.position[1] - enemy[1]
+
+                # พยายามเดินในแนวตั้งก่อน
                 if dx != 0:
                     step_x = 1 if dx > 0 else -1
                     new_x = enemy[0] + step_x
                     new_y = enemy[1]
                     if (new_x, new_y) not in self.obstacles:
                         self.enemy_position[idx] = (new_x, new_y)
-                        enemy = (new_x, new_y)  # อัปเดตตำแหน่งศัตรู
+                        enemy = (new_x, new_y)
                         continue
 
-                # ถ้าไม่ได้ ให้เดินแนวนอน
+                # ถ้าไม่ได้ ให้เดินในแนวนอน
                 if dy != 0:
                     step_y = 1 if dy > 0 else -1
                     new_x = enemy[0]
                     new_y = enemy[1] + step_y
                     if (new_x, new_y) not in self.obstacles:
                         self.enemy_position[idx] = (new_x, new_y)
-                        enemy = (new_x, new_y)  # อัปเดตตำแหน่งศัตรู
+                        enemy = (new_x, new_y)
 
-        # ตรวจสอบว่าผู้เล่นโดนศัตรูตัวใดตัวหนึ่ง
-        if tuple(self.position) in self.enemy_position:
-            self.game_over = True
-            lose_label = Label(
-                text="YOU LOSE!",
-                font_size=50,
-                bold=True,
-                color=(1, 0, 0, 1),
-                size_hint=(None, None),
-                pos=(Window.width // 2 - 100, Window.height // 2 - 25),
-            )
-            self.add_widget(lose_label)
+        # บันทึกตำแหน่งปัจจุบันของผู้เล่นไว้เป็นตำแหน่งก่อนหน้าในการเคลื่อนที่ครั้งถัดไป
+        self.prev_position = list(self.position)
 
     def move(self, dx, dy):
         """ฟังก์ชันเคลื่อนที่ตัวละคร"""
@@ -359,7 +357,7 @@ class TheEnchantersFateGame(Widget):
             self.draw_exit()
             self.draw_enemy()
 
-        # ตรวจสอบสถานะการแพ้
+        # ตรวจสอบสถานะการแพ้ (หลังจากศัตรูเคลื่อนที่)
         if tuple(self.position) in self.enemy_position:
             self.game_over = True
             lose_label = Label(
