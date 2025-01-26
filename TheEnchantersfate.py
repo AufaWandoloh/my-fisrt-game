@@ -475,16 +475,19 @@ class TheEnchantersFateGame(Widget):
 
     def draw_enemy(self):
         """วาดศัตรูทั้งหมดในด่าน"""
-        with self.canvas:
-            for enemy in self.enemy_position:
-                Color(0, 1, 0)  # สีเขียวสำหรับศัตรู
-                Rectangle(
-                    pos=(
-                        enemy[0] * self.cell_size + self.offset_x,
-                        enemy[1] * self.cell_size + self.offset_y,
-                    ),
-                    size=(self.cell_size, self.cell_size),
-                )
+        for position in self.enemy_position:
+            # ตรวจสอบตำแหน่งศัตรูที่อยู่ใน grid
+            enemy_image = Image(
+                source="slime.png",  # แก้ไขให้เป็นไฟล์ PNG ที่ใช้
+                size=(self.cell_size, self.cell_size),
+            )
+            # คำนวณตำแหน่งที่ต้องการวางภาพศัตรู
+            enemy_image.pos = (
+                position[0] * self.cell_size + self.offset_x,
+                position[1] * self.cell_size + self.offset_y,
+            )
+            # เพิ่มภาพศัตรูลงใน widget
+            self.add_widget(enemy_image)
 
     def draw_exit(self):
         """วาดตำแหน่งประตู"""
