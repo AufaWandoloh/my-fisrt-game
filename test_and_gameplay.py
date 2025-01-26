@@ -33,11 +33,149 @@ class MenuScreen(Screen):
             size_hint=(0.3, 0.1),
             pos_hint={"center_x": 0.5, "center_y": 0.3},
         )
+        next_button.bind(on_press=self.go_to_story)  # เปลี่ยนเป็น go_to_story
+        self.add_widget(next_button)
+
+    def go_to_story(self, instance):
+        # เปลี่ยนหน้าจอไปยัง StoryScreen
+        self.manager.current = "story1"
+
+
+class StoryScreen1(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # ข้อความเรื่องราวในสเตจ 1
+        story_text = """In a distant land, a powerful enchanter was trapped in a 
+        demonic labyrinth by a malicious spell."""
+        self.display_story(story_text)
+
+        # ปุ่ม Next
+        next_button = Button(
+            text="Next",
+            font_size=24,
+            size_hint=(0.3, 0.1),
+            pos_hint={"center_x": 0.5, "center_y": 0.3},
+        )
+        next_button.bind(on_press=self.go_to_next_screen)
+        self.add_widget(next_button)
+
+    def display_story(self, text):
+        story_label = Label(
+            text=text,
+            font_size=24,
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 100),
+            pos=(25, Window.height // 2),
+            halign="center",
+            valign="middle",
+        )
+        self.add_widget(story_label)
+
+    def go_to_next_screen(self, instance):
+        self.manager.current = "story2"  # เปลี่ยนไปยัง StoryScreen2
+
+
+class StoryScreen2(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # ข้อความเรื่องราวในสเตจ 2
+        story_text = """To escape, the enchanter must navigate the maze, 
+        avoid enemies, and find the magical exit."""
+        self.display_story(story_text)
+
+        # ปุ่ม Next
+        next_button = Button(
+            text="Next",
+            font_size=24,
+            size_hint=(0.3, 0.1),
+            pos_hint={"center_x": 0.5, "center_y": 0.3},
+        )
+        next_button.bind(on_press=self.go_to_next_screen)
+        self.add_widget(next_button)
+
+    def display_story(self, text):
+        story_label = Label(
+            text=text,
+            font_size=24,
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 100),
+            pos=(25, Window.height // 2),
+            halign="center",
+            valign="middle",
+        )
+        self.add_widget(story_label)
+
+    def go_to_next_screen(self, instance):
+        self.manager.current = "story3"  # เปลี่ยนไปยัง StoryScreen3
+
+
+class StoryScreen3(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # ข้อความเรื่องราวในสเตจ 3
+        story_text = """Will you guide the enchanter to freedom?"""
+        self.display_story(story_text)
+
+        # ปุ่ม Next
+        next_button = Button(
+            text="Next",
+            font_size=24,
+            size_hint=(0.3, 0.1),
+            pos_hint={"center_x": 0.5, "center_y": 0.3},
+        )
+        next_button.bind(on_press=self.go_to_next_screen)
+        self.add_widget(next_button)
+
+    def display_story(self, text):
+        story_label = Label(
+            text=text,
+            font_size=24,
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 100),
+            pos=(25, Window.height // 2),
+            halign="center",
+            valign="middle",
+        )
+        self.add_widget(story_label)
+
+    def go_to_next_screen(self, instance):
+        self.manager.current = "story4"  # เปลี่ยนไปยัง StoryScreen4
+
+
+class StoryScreen4(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # ข้อความเรื่องราวในสเตจ 4
+        story_text = """The story begin"""
+        self.display_story(story_text)
+
+        # ปุ่ม Next
+        next_button = Button(
+            text="Start Game",
+            font_size=24,
+            size_hint=(0.3, 0.1),
+            pos_hint={"center_x": 0.5, "center_y": 0.3},
+        )
         next_button.bind(on_press=self.go_to_game)
         self.add_widget(next_button)
 
+    def display_story(self, text):
+        story_label = Label(
+            text=text,
+            font_size=24,
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 100),
+            pos=(25, Window.height // 2),
+            halign="center",
+            valign="middle",
+        )
+        self.add_widget(story_label)
+
     def go_to_game(self, instance):
-        # เปลี่ยนหน้าจอไปยังเกม
         self.manager.current = "game"
 
 
@@ -450,39 +588,30 @@ class TheEnchantersFateGame(Widget):
 
 class GameApp(App):
     def build(self):
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name="menu"))
+        sm.add_widget(StoryScreen1(name="story1"))
+        sm.add_widget(StoryScreen2(name="story2"))
+        sm.add_widget(StoryScreen3(name="story3"))
+        sm.add_widget(StoryScreen4(name="story4"))
+        sm.add_widget(GameScreen(name="game"))
+
         # ตรวจสอบไฟล์เสียง
         sound_path = "agua_hiperrealista.wav"
         if os.path.exists(sound_path):
             self.bg_music = SoundLoader.load(sound_path)
             if self.bg_music:
-                self.bg_music.loop = True
-                self.bg_music.play()
+                self.bg_music.loop = True  # ตั้งให้เสียงเล่นวนลูป
+                self.bg_music.play()  # เล่นเสียง
         else:
             print(f"ไม่พบไฟล์เสียง: {sound_path}")
 
-        # ตั้งค่าตัวจัดการหน้าจอ
-        sm = ScreenManager()
-        sm.add_widget(MenuScreen(name="menu"))
-        sm.add_widget(GameScreen(name="game"))
         return sm
 
     def on_stop(self):
         # หยุดเสียงเมื่อปิดเกม
         if hasattr(self, "bg_music") and self.bg_music:
             self.bg_music.stop()
-
-
-if __name__ == "__main__":
-    GameApp().run()
-
-
-# ตัวจัดการหน้าจอ
-class GameApp(App):
-    def build(self):
-        sm = ScreenManager()
-        sm.add_widget(MenuScreen(name="menu"))
-        sm.add_widget(GameScreen(name="game"))
-        return sm
 
 
 if __name__ == "__main__":
