@@ -6,7 +6,8 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.image import Image
-
+from kivy.core.audio import SoundLoader
+import os
 
 # ตั้งค่าขนาดหน้าต่าง
 Window.size = (800, 600)
@@ -422,6 +423,34 @@ class TheEnchantersFateGame(Widget):
     def on_key_up(self, window, key, scancode):
         """ฟังก์ชันตรวจจับการปล่อยปุ่ม"""
         self.key_pressed = False  # รีเซ็ตสถานะเมื่อปล่อยปุ่ม
+
+
+class GameApp(App):
+    def build(self):
+        # ตรวจสอบไฟล์เสียง
+        sound_path = "agua_hiperrealista.wav"
+        if os.path.exists(sound_path):
+            self.bg_music = SoundLoader.load(sound_path)
+            if self.bg_music:
+                self.bg_music.loop = True
+                self.bg_music.play()
+        else:
+            print(f"ไม่พบไฟล์เสียง: {sound_path}")
+
+        # ตั้งค่าตัวจัดการหน้าจอ
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name="menu"))
+        sm.add_widget(GameScreen(name="game"))
+        return sm
+
+    def on_stop(self):
+        # หยุดเสียงเมื่อปิดเกม
+        if hasattr(self, "bg_music") and self.bg_music:
+            self.bg_music.stop()
+
+
+if __name__ == "__main__":
+    GameApp().run()
 
 
 # ตัวจัดการหน้าจอ
