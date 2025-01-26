@@ -51,9 +51,10 @@ class GameScreen(Screen):
         self.add_ui()
 
     def add_ui(self):
-        """เพิ่ม UI สำหรับปุ่มเริ่มใหม่"""
+        """เพิ่ม UI สำหรับปุ่มเริ่มใหม่และปิดเสียง"""
+        # ปุ่มเริ่มใหม่
         restart_button = Button(
-            text="restart",
+            text="Restart",
             font_size=20,
             size_hint=(None, None),
             size=(120, 50),
@@ -62,9 +63,31 @@ class GameScreen(Screen):
         restart_button.bind(on_press=self.restart_game)
         self.add_widget(restart_button)
 
+        # ปุ่มปิดเสียง
+        mute_button = Button(
+            text="Music on",
+            font_size=20,
+            size_hint=(None, None),
+            size=(120, 50),
+            pos=(Window.width - 150, 80),
+        )
+        mute_button.bind(on_press=self.toggle_sound)
+        self.add_widget(mute_button)
+
     def restart_game(self, instance):
         """รีเซ็ตเกมใหม่ในด่านปัจจุบัน"""
         self.game.restart_level()
+
+    def toggle_sound(self, instance):
+        """เปิดหรือปิดเสียงเพลงพื้นหลัง"""
+        app = App.get_running_app()
+        if hasattr(app, "bg_music") and app.bg_music:
+            if app.bg_music.state == "play":
+                app.bg_music.stop()
+                instance.text = "Music off"
+            else:
+                app.bg_music.play()
+                instance.text = "Music on"
 
 
 # เกม The Enchanter's Fate
