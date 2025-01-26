@@ -180,6 +180,44 @@ class TheEnchantersFateGame(Widget):
                 (10, 4),
             ]
             self.enemy_position = [(10, 10)]  # ตำแหน่งศัตรูด่าน 2
+        elif self.level == 3:
+            self.position = [0, 8]
+            self.exit_position = (10, 8)
+            self.obstacles = [
+                (0, 3),
+                (1, 1),
+                (1, 3),
+                (1, 4),
+                (1, 5),
+                (1, 9),
+                (2, 1),
+                (2, 9),
+                (3, 1),
+                (3, 9),
+                (4, 1),
+                (4, 2),
+                (4, 3),
+                (4, 4),
+                (4, 5),
+                (4, 9),
+                (5, 9),
+                (6, 7),
+                (6, 9),
+                (7, 7),
+                (7, 9),
+                (8, 7),
+                (8, 9),
+                (9, 1),
+                (9, 2),
+                (9, 3),
+                (9, 5),
+                (9, 7),
+                (9, 9),
+                (10, 1),
+                (10, 5),
+            ]
+            self.enemy_position = [(6, 10)]
+
         else:
             self.position = [0, 0]
             self.exit_position = (10, 10)
@@ -345,8 +383,6 @@ class TheEnchantersFateGame(Widget):
         # ตรวจสอบว่าผู้เล่นไปถึงประตูแล้วหรือยัง
         if self.position == list(self.exit_position):
             self.level += 1  # เพิ่มด่าน
-            if self.level > 2:  # หากเกินด่านที่มีให้
-                self.level = 1  # รีเซ็ตกลับไปด่านแรก (หรือจะทำสิ้นสุดเกมก็ได้)
             self.setup_level()
 
             # ล้างและวาดองค์ประกอบใหม่สำหรับด่านใหม่
