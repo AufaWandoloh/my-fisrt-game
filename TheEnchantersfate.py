@@ -461,16 +461,17 @@ class TheEnchantersFateGame(Widget):
             self.add_widget(obstacle_image)
 
     def draw_character(self):
-        """วาดตัวละคร"""
+        """วาดตัวละคร (ใช้ภาพ)"""
         with self.canvas:
-            Color(0, 0, 1)  # สีฟ้าสำหรับตัวละคร
-            Rectangle(
-                pos=(
-                    self.position[0] * self.cell_size + self.offset_x,
-                    self.position[1] * self.cell_size + self.offset_y,
-                ),
-                size=(self.cell_size, self.cell_size),
+            # โหลดภาพตัวละคร
+            char_image = Image(
+                source="Enchanter.png", size=(self.cell_size, self.cell_size)
             )
+            char_image.pos = (
+                self.position[0] * self.cell_size + self.offset_x,
+                self.position[1] * self.cell_size + self.offset_y,
+            )
+            self.add_widget(char_image)
 
     def draw_enemy(self):
         """วาดศัตรูทั้งหมดในด่าน"""
