@@ -385,6 +385,7 @@ class TheEnchantersFateGame(Widget):
                 (10, 5),
             ]
             self.enemy_position = [(6, 10)]
+            self.spikes = {(8, 8): False, (9, 9): False}
 
         else:
             self.position = [0, 0]
