@@ -64,11 +64,12 @@ class StoryScreen1(Screen):
         story_label = Label(
             text=text,
             font_size=24,
-            size_hint=(None, None),
-            size=(Window.width - 50, Window.height - 100),
-            pos=(25, Window.height // 2),
             halign="center",
             valign="middle",
+            text_size=(Window.width - 50, Window.height - 150),
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 150),
+            pos_hint={"center_x": 0.5, "center_y": 0.6},
         )
         self.add_widget(story_label)
 
@@ -142,7 +143,41 @@ class StoryScreen3(Screen):
         self.add_widget(story_label)
 
     def go_to_next_screen(self, instance):
-        self.manager.current = "game"  # เปลี่ยนไปยัง StoryScreen4
+        self.manager.current = "story4"  # เปลี่ยนไปยัง StoryScreen4
+
+
+class StoryScreen4(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # ข้อความเรื่องราวในสเตจ 4
+        story_text = """The story begin"""
+        self.display_story(story_text)
+
+        # ปุ่ม Next
+        next_button = Button(
+            text="Start Game",
+            font_size=24,
+            size_hint=(0.3, 0.1),
+            pos_hint={"center_x": 0.5, "center_y": 0.3},
+        )
+        next_button.bind(on_press=self.go_to_game)
+        self.add_widget(next_button)
+
+    def display_story(self, text):
+        story_label = Label(
+            text=text,
+            font_size=24,
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 100),
+            pos=(25, Window.height // 2),
+            halign="center",
+            valign="middle",
+        )
+        self.add_widget(story_label)
+
+    def go_to_game(self, instance):
+        self.manager.current = "game"
 
 
 class GameScreen(Screen):
@@ -559,6 +594,7 @@ class GameApp(App):
         sm.add_widget(StoryScreen1(name="story1"))
         sm.add_widget(StoryScreen2(name="story2"))
         sm.add_widget(StoryScreen3(name="story3"))
+        sm.add_widget(StoryScreen4(name="story4"))
         sm.add_widget(GameScreen(name="game"))
 
         # ตรวจสอบไฟล์เสียง
