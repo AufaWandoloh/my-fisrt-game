@@ -100,11 +100,12 @@ class StoryScreen2(Screen):
         story_label = Label(
             text=text,
             font_size=24,
-            size_hint=(None, None),
-            size=(Window.width - 50, Window.height - 100),
-            pos=(25, Window.height // 2),
             halign="center",
             valign="middle",
+            text_size=(Window.width - 50, Window.height - 150),
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 150),
+            pos_hint={"center_x": 0.5, "center_y": 0.6},
         )
         self.add_widget(story_label)
 
@@ -134,11 +135,12 @@ class StoryScreen3(Screen):
         story_label = Label(
             text=text,
             font_size=24,
-            size_hint=(None, None),
-            size=(Window.width - 50, Window.height - 100),
-            pos=(25, Window.height // 2),
             halign="center",
             valign="middle",
+            text_size=(Window.width - 50, Window.height - 150),
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 150),
+            pos_hint={"center_x": 0.5, "center_y": 0.6},
         )
         self.add_widget(story_label)
 
@@ -168,11 +170,12 @@ class StoryScreen4(Screen):
         story_label = Label(
             text=text,
             font_size=24,
-            size_hint=(None, None),
-            size=(Window.width - 50, Window.height - 100),
-            pos=(25, Window.height // 2),
             halign="center",
             valign="middle",
+            text_size=(Window.width - 50, Window.height - 150),
+            size_hint=(None, None),
+            size=(Window.width - 50, Window.height - 150),
+            pos_hint={"center_x": 0.5, "center_y": 0.6},
         )
         self.add_widget(story_label)
 
@@ -240,6 +243,7 @@ class TheEnchantersFateGame(Widget):
         self.position = []  # ตำแหน่งเริ่มต้นของผู้เล่น
         self.exit_position = []  # ตำแหน่งของประตู
         self.enemy_position = []  # ตำแหน่งศัตรูสำหรับแต่ละด่าน
+        self.spikes = {}  # ตำแหน่งและสถานะของหนาม
 
         # ตั้งค่าอุปสรรคและตำแหน่งสำหรับด่านเริ่มต้น
         self.setup_level()
@@ -255,6 +259,7 @@ class TheEnchantersFateGame(Widget):
         self.draw_character()
         self.draw_exit()
         self.draw_enemy()
+        self.draw_spikes()
 
         # เพิ่มข้อความคำแนะนำ
         self.add_instructions()
@@ -417,6 +422,29 @@ class TheEnchantersFateGame(Widget):
                         ),
                         size=(self.cell_size, self.cell_size),
                     )
+        for pos, active in self.spikes.items():
+            if active:
+                # วาดหนามในสถานะเปิด (Active)
+                self.draw_spikes(pos, "open")
+            else:
+                # วาดหนามในสถานะปิด
+                self.draw_spikes(pos, "closed")
+
+    def draw_spikes(self, *args):
+        """วาดหนามในแผนที่"""
+        for position, is_active in self.spikes.items():
+            with self.canvas:
+                if is_active:
+                    Color(1, 0, 0, 1)  # สีแดงเมื่อเปิดใช้งาน
+                else:
+                    Color(0.5, 0.5, 0.5, 1)  # สีเทาเมื่อปิด
+                Rectangle(
+                    pos=(
+                        position[0] * self.cell_size + self.offset_x,
+                        position[1] * self.cell_size + self.offset_y,
+                    ),
+                    size=(self.cell_size, self.cell_size),
+                )
 
     def draw_obstacles(self):
         """วาดหินในแผนที่"""
@@ -581,6 +609,17 @@ class TheEnchantersFateGame(Widget):
                 self.move(-1, 0)
             elif key == 100:  # D
                 self.move(1, 0)
+
+            # สลับสถานะของหนามทั้งหมด
+            for pos in self.spikes:
+                self.spikes[pos] = not self.spikes[pos]
+
+            # ตรวจสอบการชนหนาม
+            if (
+                tuple(self.position) in self.spikes
+                and self.spikes[tuple(self.position)]
+            ):
+                self.game_over("You hit a spike!")
 
     def on_key_up(self, window, key, scancode):
         """ฟังก์ชันตรวจจับการปล่อยปุ่ม"""
