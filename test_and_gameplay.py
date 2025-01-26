@@ -27,7 +27,7 @@ class MenuScreen(Screen):
 
         # สร้างปุ่ม Next
         next_button = Button(
-            text="Next",
+            text="Start",
             font_size=24,
             size_hint=(0.3, 0.1),
             pos_hint={"center_x": 0.5, "center_y": 0.3},
